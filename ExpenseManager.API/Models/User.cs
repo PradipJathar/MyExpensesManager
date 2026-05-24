@@ -32,6 +32,11 @@ namespace ExpenseManager.API.Models
 
         public bool IsActive { get; set; } = true;
 
+        [MaxLength(200)]
+        public string? RefreshToken { get; set; }
+
+        public DateTime? RefreshTokenExpiry { get; set; }
+
         // Navigation Properties
         public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
         public ICollection<Category> Categories { get; set; } = new List<Category>();
