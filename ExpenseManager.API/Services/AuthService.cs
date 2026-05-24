@@ -14,11 +14,13 @@ namespace ExpenseManager.API.Services
     {
         private readonly AppDbContext _context;
         private readonly JwtHelper _jwtHelper;
+        private readonly CategoryService _categoryService;
 
-        public AuthService(AppDbContext context, JwtHelper jwtHelper)
+        public AuthService(AppDbContext context, JwtHelper jwtHelper, CategoryService categoryService)
         {
             _context = context;
             _jwtHelper = jwtHelper;
+            _categoryService = categoryService;
         }
 
         public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
@@ -48,7 +50,7 @@ namespace ExpenseManager.API.Services
             await _context.SaveChangesAsync();
 
             // Seed default categories for new user
-            SeedDefaultCategories(user.Id);
+            await _categoryService.SeedDefaultCategoriesAsync(user.Id);
             await _context.SaveChangesAsync();
 
             // Generate tokens
@@ -185,21 +187,7 @@ namespace ExpenseManager.API.Services
             };
         }
 
-        private void SeedDefaultCategories(int userId)
-        {
-            var defaultCategories = new[]
-            {
-                new Category { UserId = userId, CategoryName = "Food", IsDefault = true, ColorCode = "#EF4444", CreatedAt = DateTime.UtcNow },
-                new Category { UserId = userId, CategoryName = "Travel", IsDefault = true, ColorCode = "#3B82F6", CreatedAt = DateTime.UtcNow },
-                new Category { UserId = userId, CategoryName = "Entertainment", IsDefault = true, ColorCode = "#10B981", CreatedAt = DateTime.UtcNow },
-                new Category { UserId = userId, CategoryName = "Shopping", IsDefault = true, ColorCode = "#F59E0B", CreatedAt = DateTime.UtcNow },
-                new Category { UserId = userId, CategoryName = "Utilities", IsDefault = true, ColorCode = "#6366F1", CreatedAt = DateTime.UtcNow },
-                new Category { UserId = userId, CategoryName = "Healthcare", IsDefault = true, ColorCode = "#EC4899", CreatedAt = DateTime.UtcNow },
-                new Category { UserId = userId, CategoryName = "Other", IsDefault = true, ColorCode = "#6B7280", CreatedAt = DateTime.UtcNow }
-            };
 
-            _context.Categories.AddRange(defaultCategories);
-        }
     }
 
     public class SecurityException : Exception

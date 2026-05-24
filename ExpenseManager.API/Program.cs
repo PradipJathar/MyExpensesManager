@@ -17,6 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Register JWT Helper and Authentication Service
 builder.Services.AddSingleton<JwtHelper>();
+builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ExpenseService>();
 
