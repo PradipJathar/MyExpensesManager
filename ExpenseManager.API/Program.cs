@@ -22,6 +22,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<AccountService>();
 builder.Services.AddScoped<BudgetService>();
+builder.Services.AddScoped<IncomeService>();
 
 // Add JWT Authentication
 var secretKey = builder.Configuration["JwtSettings:Secret"] ?? throw new InvalidOperationException("JWT Secret is not configured.");
