@@ -18,6 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register JWT Helper and Authentication Service
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ExpenseService>();
 
 // Add JWT Authentication
 var secretKey = builder.Configuration["JwtSettings:Secret"] ?? throw new InvalidOperationException("JWT Secret is not configured.");
