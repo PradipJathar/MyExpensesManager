@@ -28,6 +28,9 @@ namespace ExpenseManager.API.Models
         public string? AccountNumber { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
+        public decimal InitialBalance { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal CurrentBalance { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
