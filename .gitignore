@@ -1,1 +1,13 @@
-/.antigravitycli
+# GenAI CLI
+.antigravitycli/
+
+# Angular / Node
+node_modules/
+
+# .NET build folders
+bin/
+obj/
+
+# VS / VS Code
+.vs/
+.vscode/
