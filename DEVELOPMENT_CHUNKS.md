@@ -26,7 +26,7 @@ Each chunk includes:
 
 ### What You're Building
 - .NET 8.0 API project structure
-- PostgreSQL database setup
+- SQL Server database setup
 - Entity models (User, Expense, Category, Budget, Account, Income)
 - Database context (DbContext)
 - Entity migrations
@@ -54,13 +54,13 @@ ExpenseManager.API/
 ### Prompt for Anti Gravity CLI Code
 
 ```
-I'm building a personal expense management application using C#/.NET 8.0 and PostgreSQL.
+I'm building a personal expense management application using C#/.NET 8.0 and SQL Server.
 
 Create the backend API project structure with:
 
 1. Create .NET 8.0 Web API project with these packages:
    - EntityFrameworkCore
-   - EntityFrameworkCore.PostgreSQL
+   - Microsoft.EntityFrameworkCore.SqlServer
    - BCrypt.Net-Next (for password hashing)
    - System.IdentityModel.Tokens.Jwt (for JWT)
 
@@ -99,14 +99,14 @@ cd ExpenseManager.API
 
 # Add NuGet packages
 dotnet add package Microsoft.EntityFrameworkCore
-dotnet add package Microsoft.EntityFrameworkCore.PostgreSQL
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 dotnet add package BCrypt.Net-Next
 dotnet add package System.IdentityModel.Tokens.Jwt
 
 # Create database migration
 dotnet ef migrations add InitialCreate
 
-# Apply migration (make sure PostgreSQL is running)
+# Apply migration (make sure SQL Server is running)
 dotnet ef database update
 
 # Run the API
@@ -119,7 +119,7 @@ dotnet run
 - ✅ All 6 entity models defined
 - ✅ DbContext configured
 - ✅ Database migration created
-- ✅ Can connect to PostgreSQL
+- ✅ Can connect to SQL Server
 
 ---
 
@@ -1850,7 +1850,7 @@ ng serve
 ### Deployment
 - [ ] Deploy frontend to Netlify
 - [ ] Deploy backend to Railway
-- [ ] Set up database on Neon
+- [ ] Set up database on local
 - [ ] Test production environment
 - [ ] Launch MVP 🚀
 
