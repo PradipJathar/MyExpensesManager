@@ -1,0 +1,68 @@
+<div class="detail-container">
+  <mat-card class="detail-card">
+    <div class="loading-overlay" *ngIf="isLoading">
+      <mat-spinner diameter="45"></mat-spinner>
+    </div>
+
+    <!-- Error Alert -->
+    <div class="alert alert-danger" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && expense">
+      <mat-card-header>
+        <div class="header-main">
+          <span class="category-pill" [style.background-color]="expense.categoryColor + '15'" [style.color]="expense.categoryColor">
+            {{ expense.categoryName }}
+          </span>
+          <h1 class="amount-title">{{ expense.amount | currency }}</h1>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content class="detail-content">
+        <div class="detail-grid">
+          <!-- Date -->
+          <div class="detail-item">
+            <span class="detail-label">Date</span>
+            <span class="detail-value">{{ expense.expenseDate | date:'fullDate' }}</span>
+          </div>
+
+          <!-- Account -->
+          <div class="detail-item">
+            <span class="detail-label">Paid From Account</span>
+            <span class="detail-value">{{ expense.accountName }}</span>
+          </div>
+
+          <!-- Description -->
+          <div class="detail-item full-width">
+            <span class="detail-label">Description / Notes</span>
+            <span class="detail-value description-text">{{ expense.description || 'No description provided.' }}</span>
+          </div>
+
+          <!-- Timestamps -->
+          <div class="detail-item half-width">
+            <span class="detail-label">Logged At</span>
+            <span class="detail-value small-text">{{ expense.createdAt | date:'medium' }}</span>
+          </div>
+
+          <div class="detail-item half-width" *ngIf="expense.updatedAt !== expense.createdAt">
+            <span class="detail-label">Last Updated</span>
+            <span class="detail-value small-text">{{ expense.updatedAt | date:'medium' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <div class="detail-actions">
+        <button mat-button routerLink="/expenses">Back to list</button>
+        <div class="right-actions">
+          <button mat-raised-button color="primary" [routerLink]="['/expenses', expense.id, 'edit']">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button mat-raised-button color="warn" (click)="onDelete()">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>
