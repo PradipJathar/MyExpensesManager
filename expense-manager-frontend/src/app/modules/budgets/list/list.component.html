@@ -1,0 +1,150 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="header-section">
+    <div>
+      <h1 class="page-title">Budgets</h1>
+      <p class="page-subtitle">Set monthly category spending targets and monitor progress</p>
+    </div>
+    <button mat-raised-button color="primary" routerLink="/budgets/new">
+      <mat-icon>add</mat-icon> Add Budget
+    </button>
+  </div>
+
+  <!-- Filters & Summary Layout -->
+  <div class="summary-and-filters">
+    <!-- Filter Card -->
+    <mat-card class="filter-card">
+      <form [formGroup]="filterForm" class="filter-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Month</mat-label>
+          <mat-select formControlName="periodMonth">
+            <mat-option *ngFor="let m of months" [value]="m.value">
+              {{ m.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Year</mat-label>
+          <mat-select formControlName="periodYear">
+            <mat-option *ngFor="let y of years" [value]="y">
+              {{ y }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
+    </mat-card>
+
+    <!-- Overview Totals Card -->
+    <mat-card class="overview-card" *ngIf="filteredBudgets.length > 0">
+      <div class="totals-grid">
+        <div class="total-item">
+          <span class="total-label">Total Budgeted</span>
+          <span class="total-val">{{ totalBudgeted | currency }}</span>
+        </div>
+        <div class="total-item">
+          <span class="total-label">Total Spent</span>
+          <span class="total-val warning-text">{{ totalSpent | currency }}</span>
+        </div>
+        <div class="total-item">
+          <span class="total-label">Remaining</span>
+          <span class="total-val" [class.success-text]="totalRemaining >= 0" [class.danger-text]="totalRemaining < 0">
+            {{ totalRemaining | currency }}
+          </span>
+        </div>
+      </div>
+
+      <div class="global-progress-section">
+        <div class="progress-info">
+          <span>Overall Usage</span>
+          <span>{{ totalPercentage | number:'1.0-1' }}%</span>
+        </div>
+        <div class="custom-progress-container">
+          <div class="custom-progress-bar" [style.width.%]="getBoundedPercentage(totalPercentage)" [ngClass]="getProgressBarClass(totalPercentage)"></div>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <!-- Error Message -->
+  <div class="alert alert-danger" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Budget Cards Grid -->
+  <div class="budget-grid" *ngIf="!isLoading && !errorMessage">
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredBudgets.length === 0">
+      <mat-icon class="empty-icon">pie_chart_outline</mat-icon>
+      <h3>No Budgets Set</h3>
+      <p>There are no budgets configured for the selected month and year.</p>
+      <button mat-raised-button color="primary" routerLink="/budgets/new" class="empty-btn">
+        Set First Budget
+      </button>
+    </div>
+
+    <!-- Cards -->
+    <mat-card class="budget-card" *ngFor="let budget of filteredBudgets">
+      <mat-card-header>
+        <div class="card-header-layout">
+          <div>
+            <span class="category-badge" [style.background-color]="budget.categoryColor + '15'" [style.color]="budget.categoryColor">
+              {{ budget.categoryName }}
+            </span>
+            <span class="period-text">{{ months[budget.periodMonth - 1].name }} {{ budget.periodYear }}</span>
+          </div>
+          <div class="header-actions">
+            <button mat-icon-button [routerLink]="['/budgets', budget.budgetId, 'edit']" matTooltip="Edit">
+              <mat-icon class="icon-btn-edit">edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="onDelete(budget.budgetId)" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content class="card-content-layout">
+        <!-- Spent / Budgeted amounts -->
+        <div class="amounts-summary">
+          <div class="spent-value">
+            <span class="number">{{ budget.spentAmount | currency }}</span>
+            <span class="label">spent</span>
+          </div>
+          <div class="divider">/</div>
+          <div class="budget-value">
+            <span class="number">{{ budget.budgetAmount | currency }}</span>
+            <span class="label">limit</span>
+          </div>
+        </div>
+
+        <!-- Custom premium progress bar -->
+        <div class="custom-progress-container">
+          <div class="custom-progress-bar" [style.width.%]="getBoundedPercentage(budget.percentageUsed)" [ngClass]="getProgressBarClass(budget.percentageUsed)"></div>
+        </div>
+
+        <!-- Percentage and status messages -->
+        <div class="card-footer-layout">
+          <span class="percent-label">{{ budget.percentageUsed | number:'1.0-1' }}% used</span>
+          
+          <div class="status-badge-container">
+            <span class="status-badge badge-exceeded" *ngIf="budget.isExceeded">
+              <mat-icon>error</mat-icon> Exceeded
+            </span>
+            <span class="status-badge badge-warning" *ngIf="!budget.isExceeded && budget.isAlert">
+              <mat-icon>warning</mat-icon> Warning Limit
+            </span>
+            <span class="status-badge badge-good" *ngIf="!budget.isExceeded && !budget.isAlert">
+              <mat-icon>check_circle</mat-icon> On Track
+            </span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

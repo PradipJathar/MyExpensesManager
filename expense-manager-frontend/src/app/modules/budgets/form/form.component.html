@@ -1,0 +1,98 @@
+<div class="form-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title class="form-title">
+        {{ isEditMode ? 'Edit Budget' : 'Add Budget' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ isEditMode ? 'Modify spending limit targets for this category' : 'Set a new spending limit target for a category' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="form-content">
+      <div class="loading-overlay" *ngIf="isLoading && isEditMode">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <!-- Error Alert -->
+      <div class="alert alert-danger" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <form [formGroup]="budgetForm" (ngSubmit)="onSubmit()" class="budget-form" *ngIf="!isLoading || !isEditMode">
+        <!-- Category Dropdown -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Category</mat-label>
+          <mat-select formControlName="categoryId" required>
+            <mat-option *ngFor="let cat of categories" [value]="cat.id">
+              {{ cat.categoryName }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="budgetForm.get('categoryId')?.hasError('required')">
+            Category is required.
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Budget Amount -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Limit Amount</mat-label>
+          <input matInput type="number" formControlName="budgetAmount" placeholder="0.00" required step="0.01">
+          <span matPrefix>$&nbsp;</span>
+          <mat-error *ngIf="budgetForm.get('budgetAmount')?.hasError('required')">
+            Limit Amount is required.
+          </mat-error>
+          <mat-error *ngIf="budgetForm.get('budgetAmount')?.hasError('min')">
+            Limit Amount must be greater than zero.
+          </mat-error>
+        </mat-form-field>
+
+        <div class="period-row">
+          <!-- Month Dropdown -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Month</mat-label>
+            <mat-select formControlName="periodMonth" required>
+              <mat-option *ngFor="let m of months" [value]="m.value">
+                {{ m.name }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="budgetForm.get('periodMonth')?.hasError('required')">
+              Month is required.
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Year Dropdown -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Year</mat-label>
+            <mat-select formControlName="periodYear" required>
+              <mat-option *ngFor="let y of years" [value]="y">
+                {{ y }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="budgetForm.get('periodYear')?.hasError('required')">
+              Year is required.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Warning Alert Threshold -->
+        <div class="slider-field">
+          <div class="slider-labels">
+            <span class="slider-title">Alert Notification Threshold</span>
+            <span class="slider-val">{{ budgetForm.get('alertThreshold')?.value }}%</span>
+          </div>
+          <p class="slider-desc">Get warned when spending in this category reaches this percentage of your budget.</p>
+          <mat-slider formControlName="alertThreshold" min="0" max="100" step="5" thumbLabel tickInterval="10" class="full-width"></mat-slider>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/budgets" [disabled]="isLoading">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="budgetForm.invalid || isLoading">
+            <span *ngIf="!isLoading">{{ isEditMode ? 'Save Changes' : 'Create Budget' }}</span>
+            <mat-spinner diameter="20" *ngIf="isLoading" color="accent" class="spinner-inline"></mat-spinner>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
