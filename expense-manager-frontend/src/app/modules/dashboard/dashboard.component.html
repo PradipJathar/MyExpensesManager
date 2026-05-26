@@ -1,0 +1,195 @@
+<div class="page-container">
+  <!-- Header & Filters -->
+  <div class="header-section">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">Welcome back! Here's your financial overview.</p>
+    </div>
+    
+    <mat-card class="filter-card">
+      <form [formGroup]="filterForm" class="filter-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Month</mat-label>
+          <mat-select formControlName="periodMonth">
+            <mat-option *ngFor="let m of months" [value]="m.value">
+              {{ m.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Year</mat-label>
+          <mat-select formControlName="periodYear">
+            <mat-option *ngFor="let y of years" [value]="y">
+              {{ y }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
+    </mat-card>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <!-- Error State -->
+  <div class="alert alert-danger" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Main Content Dashboard -->
+  <div *ngIf="!isLoading && !errorMessage">
+    <!-- Key Summary Metrics Grid -->
+    <div class="metrics-grid">
+      <!-- Income Card -->
+      <mat-card class="metric-card card-income">
+        <div class="card-inner">
+          <div class="metric-details">
+            <span class="metric-label">Total Income</span>
+            <h2 class="metric-value">{{ summary.totalIncome | currency }}</h2>
+          </div>
+          <div class="metric-icon">
+            <mat-icon>arrow_upward</mat-icon>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Expenses Card -->
+      <mat-card class="metric-card card-expenses">
+        <div class="card-inner">
+          <div class="metric-details">
+            <span class="metric-label">Total Expenses</span>
+            <h2 class="metric-value">{{ summary.totalExpenses | currency }}</h2>
+          </div>
+          <div class="metric-icon">
+            <mat-icon>arrow_downward</mat-icon>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Net Balance Card -->
+      <mat-card class="metric-card card-net" [ngClass]="{'positive-net': summary.netAmount >= 0, 'negative-net': summary.netAmount < 0}">
+        <div class="card-inner">
+          <div class="metric-details">
+            <span class="metric-label">Net Balance</span>
+            <h2 class="metric-value">{{ summary.netAmount | currency }}</h2>
+          </div>
+          <div class="metric-icon">
+            <mat-icon>{{ summary.netAmount >= 0 ? 'account_balance_wallet' : 'trending_down' }}</mat-icon>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Budget Card -->
+      <mat-card class="metric-card card-budget">
+        <div class="card-inner flex-column">
+          <div class="budget-header">
+            <div class="metric-details">
+              <span class="metric-label">Total Budget Spent</span>
+              <h2 class="metric-value">{{ summary.totalBudgetSpent | currency }} <span class="budget-limit">/ {{ summary.totalBudgeted | currency }}</span></h2>
+            </div>
+            <span class="percent-tag" [ngClass]="{
+              'progress-green': getBudgetPercentage(summary.totalBudgetSpent, summary.totalBudgeted) < 70,
+              'progress-yellow': getBudgetPercentage(summary.totalBudgetSpent, summary.totalBudgeted) >= 70 && getBudgetPercentage(summary.totalBudgetSpent, summary.totalBudgeted) < 90,
+              'progress-red': getBudgetPercentage(summary.totalBudgetSpent, summary.totalBudgeted) >= 90
+            }">
+              {{ getBudgetPercentage(summary.totalBudgetSpent, summary.totalBudgeted) | number:'1.0-0' }}%
+            </span>
+          </div>
+          <div class="progress-bar-container">
+            <mat-progress-bar mode="determinate" [value]="getBudgetPercentage(summary.totalBudgetSpent, summary.totalBudgeted)" [color]="getBudgetPercentage(summary.totalBudgetSpent, summary.totalBudgeted) >= 90 ? 'warn' : 'primary'"></mat-progress-bar>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Main Workspace Grid -->
+    <div class="dashboard-grid">
+      <!-- Left side: Quick actions & Transactions -->
+      <div class="dashboard-col-left">
+        <!-- Quick Actions Card -->
+        <mat-card class="action-card">
+          <mat-card-header>
+            <mat-card-title>Quick Actions</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="action-buttons-container">
+            <button mat-raised-button color="primary" routerLink="/expenses/new">
+              <mat-icon>add</mat-icon> Record Expense
+            </button>
+            <button mat-stroked-button color="accent" routerLink="/reports">
+              <mat-icon>bar_chart</mat-icon> Full Reports
+            </button>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Recent Transactions Table Card -->
+        <mat-card class="transactions-card">
+          <mat-card-header>
+            <div class="card-header-layout">
+              <mat-card-title>Recent Expenses</mat-card-title>
+              <button mat-button color="primary" routerLink="/expenses">View All</button>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="empty-state" *ngIf="recentExpenses.length === 0">
+              <mat-icon class="empty-icon">receipt_long</mat-icon>
+              <h4>No recent expenses</h4>
+              <p>You haven't recorded any expenses for the selected period.</p>
+            </div>
+            
+            <table class="premium-table" *ngIf="recentExpenses.length > 0">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                  <th class="text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let expense of recentExpenses">
+                  <td>
+                    <span class="category-badge" [style.background-color]="expense.categoryColor + '15'" [style.color]="expense.categoryColor">
+                      {{ expense.categoryName }}
+                    </span>
+                  </td>
+                  <td class="desc-cell" [matTooltip]="expense.description">{{ expense.description || 'No description' }}</td>
+                  <td>{{ expense.expenseDate | date:'MMM d, y' }}</td>
+                  <td class="text-right amount-cell">{{ expense.amount | currency }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Right side: Trend Chart -->
+      <div class="dashboard-col-right">
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Spending vs Income Trend</mat-card-title>
+            <mat-card-subtitle>Last 6 months overview</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="chart-wrapper">
+            <div *ngIf="chartOptions">
+              <apx-chart
+                [series]="chartOptions.series"
+                [chart]="chartOptions.chart"
+                [xaxis]="chartOptions.xaxis"
+                [yaxis]="chartOptions.yaxis"
+                [colors]="chartOptions.colors"
+                [dataLabels]="chartOptions.dataLabels"
+                [stroke]="chartOptions.stroke"
+                [fill]="chartOptions.fill"
+                [tooltip]="chartOptions.tooltip"
+                [legend]="chartOptions.legend"
+              ></apx-chart>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

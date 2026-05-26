@@ -1,0 +1,171 @@
+<div class="page-container">
+  <!-- Header & Period Filter -->
+  <div class="header-section">
+    <div>
+      <h1 class="page-title">Financial Reports</h1>
+      <p class="page-subtitle">Deep dive analysis of your income, expenses, and budget statuses.</p>
+    </div>
+
+    <mat-card class="filter-card">
+      <form [formGroup]="filterForm" class="filter-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Month</mat-label>
+          <mat-select formControlName="periodMonth">
+            <mat-option *ngFor="let m of months" [value]="m.value">
+              {{ m.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Year</mat-label>
+          <mat-select formControlName="periodYear">
+            <mat-option *ngFor="let y of years" [value]="y">
+              {{ y }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
+    </mat-card>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <!-- Error Alert -->
+  <div class="alert alert-danger" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Reports Grid Content -->
+  <div *ngIf="!isLoading && !errorMessage">
+    <!-- Monthly Metrics Cards -->
+    <div class="metrics-summary">
+      <div class="metric-box">
+        <span class="box-label">Monthly Income</span>
+        <span class="box-value success-text">{{ summary.totalIncome | currency }}</span>
+      </div>
+      <div class="metric-box">
+        <span class="box-label">Monthly Expenses</span>
+        <span class="box-value danger-text">{{ summary.totalExpenses | currency }}</span>
+      </div>
+      <div class="metric-box">
+        <span class="box-label">Net Savings</span>
+        <span class="box-value" [class.success-text]="summary.netAmount >= 0" [class.danger-text]="summary.netAmount < 0">
+          {{ summary.netAmount | currency }}
+        </span>
+      </div>
+      <div class="metric-box">
+        <span class="box-label">Total Budgeted</span>
+        <span class="box-value neutral-text">{{ summary.totalBudgeted | currency }}</span>
+      </div>
+    </div>
+
+    <!-- Charts Grid (2x2 layout) -->
+    <div class="charts-grid">
+      <!-- Chart 1: Category Breakdown -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Category Expense Breakdown</mat-card-title>
+          <mat-card-subtitle>Expenses distributed by category tags</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="chart-content">
+          <div class="empty-state" *ngIf="!categoryPieOptions">
+            <mat-icon class="empty-icon">pie_chart_outline</mat-icon>
+            <h4>No data available</h4>
+            <p>There are no expenses recorded for this month.</p>
+          </div>
+          <div *ngIf="categoryPieOptions">
+            <apx-chart
+              [series]="categoryPieOptions.series"
+              [chart]="categoryPieOptions.chart"
+              [labels]="categoryPieOptions.labels"
+              [colors]="categoryPieOptions.colors"
+              [legend]="categoryPieOptions.legend"
+              [dataLabels]="categoryPieOptions.dataLabels"
+              [tooltip]="categoryPieOptions.tooltip"
+            ></apx-chart>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Chart 2: Income vs Expense Comparison -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Monthly Comparison</mat-card-title>
+          <mat-card-subtitle>Current vs previous month income & expenses</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="chart-content">
+          <div *ngIf="comparisonBarOptions">
+            <apx-chart
+              [series]="comparisonBarOptions.series"
+              [chart]="comparisonBarOptions.chart"
+              [plotOptions]="comparisonBarOptions.plotOptions"
+              [dataLabels]="comparisonBarOptions.dataLabels"
+              [stroke]="comparisonBarOptions.stroke"
+              [xaxis]="comparisonBarOptions.xaxis"
+              [yaxis]="comparisonBarOptions.yaxis"
+              [fill]="comparisonBarOptions.fill"
+              [colors]="comparisonBarOptions.colors"
+              [legend]="comparisonBarOptions.legend"
+              [tooltip]="comparisonBarOptions.tooltip"
+            ></apx-chart>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Chart 3: Trends Line Chart -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>6-Month Trends</mat-card-title>
+          <mat-card-subtitle>History of income vs expense tracking</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="chart-content">
+          <div *ngIf="trendsLineOptions">
+            <apx-chart
+              [series]="trendsLineOptions.series"
+              [chart]="trendsLineOptions.chart"
+              [colors]="trendsLineOptions.colors"
+              [stroke]="trendsLineOptions.stroke"
+              [xaxis]="trendsLineOptions.xaxis"
+              [yaxis]="trendsLineOptions.yaxis"
+              [legend]="trendsLineOptions.legend"
+              [tooltip]="trendsLineOptions.tooltip"
+            ></apx-chart>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Chart 4: Budget vs Actual Bar Chart -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Budget vs Actual Spending</mat-card-title>
+          <mat-card-subtitle>Comparing budgeted targets to actual expenses</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="chart-content">
+          <div class="empty-state" *ngIf="!budgetVsActualOptions">
+            <mat-icon class="empty-icon">bar_chart</mat-icon>
+            <h4>No budgets configured</h4>
+            <p>You have not configured any category budgets for this period.</p>
+          </div>
+          <div *ngIf="budgetVsActualOptions">
+            <apx-chart
+              [series]="budgetVsActualOptions.series"
+              [chart]="budgetVsActualOptions.chart"
+              [plotOptions]="budgetVsActualOptions.plotOptions"
+              [dataLabels]="budgetVsActualOptions.dataLabels"
+              [stroke]="budgetVsActualOptions.stroke"
+              [xaxis]="budgetVsActualOptions.xaxis"
+              [yaxis]="budgetVsActualOptions.yaxis"
+              [colors]="budgetVsActualOptions.colors"
+              [legend]="budgetVsActualOptions.legend"
+              [tooltip]="budgetVsActualOptions.tooltip"
+            ></apx-chart>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
