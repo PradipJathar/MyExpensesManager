@@ -1,0 +1,100 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="header-section">
+    <div>
+      <h1 class="page-title">Accounts</h1>
+      <p class="page-subtitle">Manage your bank accounts, credit cards, and cash wallets</p>
+    </div>
+    <button mat-raised-button color="primary" routerLink="/accounts/new">
+      <mat-icon>add</mat-icon> Add Account
+    </button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-section" *ngIf="accounts.length > 0 && !isLoading">
+    <mat-card class="summary-card net-wealth-card">
+      <span class="summary-label">Net Wealth</span>
+      <h2 class="summary-val" [class.success-text]="netWealth >= 0" [class.danger-text]="netWealth < 0">
+        {{ netWealth | currency }}
+      </h2>
+    </mat-card>
+    <mat-card class="summary-card assets-card">
+      <span class="summary-label">Total Assets</span>
+      <h2 class="summary-val success-text">{{ totalAssets | currency }}</h2>
+    </mat-card>
+    <mat-card class="summary-card liabilities-card">
+      <span class="summary-label">Total Liabilities</span>
+      <h2 class="summary-val danger-text">{{ totalLiabilities | currency }}</h2>
+    </mat-card>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <!-- Error Message -->
+  <div class="alert alert-danger" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Account Cards Grid -->
+  <div class="accounts-grid" *ngIf="!isLoading && !errorMessage">
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="accounts.length === 0">
+      <mat-icon class="empty-icon">account_balance_wallet</mat-icon>
+      <h3>No Accounts Found</h3>
+      <p>Add a bank account, credit card, or cash wallet to begin tracking your expenses.</p>
+      <button mat-raised-button color="primary" routerLink="/accounts/new" class="empty-btn">
+        Add First Account
+      </button>
+    </div>
+
+    <!-- Cards -->
+    <mat-card class="account-card" *ngFor="let account of accounts" [ngClass]="{
+      'bank-border': account.accountType === 'Bank',
+      'card-border': account.accountType === 'Credit Card',
+      'cash-border': account.accountType === 'Cash'
+    }">
+      <mat-card-header>
+        <div class="card-header-layout">
+          <div class="title-section">
+            <div class="type-icon-wrapper" [ngClass]="{
+              'bank-icon': account.accountType === 'Bank',
+              'card-icon': account.accountType === 'Credit Card',
+              'cash-icon': account.accountType === 'Cash'
+            }">
+              <mat-icon>{{ getAccountTypeIcon(account.accountType) }}</mat-icon>
+            </div>
+            <div>
+              <h3 class="account-name">{{ account.accountName }}</h3>
+              <span class="account-type">{{ account.accountType }}</span>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button mat-icon-button [routerLink]="['/accounts', account.id, 'edit']" matTooltip="Edit">
+              <mat-icon class="icon-btn-edit">edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="onDelete(account.id)" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content class="card-content-layout">
+        <div class="number-section" *ngIf="account.accountNumber">
+          <span class="label">Account Number</span>
+          <span class="value">{{ account.accountNumber }}</span>
+        </div>
+
+        <div class="balance-section">
+          <span class="label">Current Balance</span>
+          <span class="balance" [class.negative-balance]="account.accountType === 'Credit Card' && account.currentBalance > 0">
+            {{ account.currentBalance | currency }}
+          </span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

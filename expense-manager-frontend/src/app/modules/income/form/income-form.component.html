@@ -1,0 +1,80 @@
+<div class="form-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title class="form-title">
+        {{ isEditMode ? 'Edit Income' : 'Record Income' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ isEditMode ? 'Modify details of your income transaction' : 'Record a new cash inflow to one of your accounts' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="form-content">
+      <div class="loading-overlay" *ngIf="isLoading && isEditMode">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <!-- Error Alert -->
+      <div class="alert alert-danger" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <form [formGroup]="incomeForm" (ngSubmit)="onSubmit()" class="income-form" *ngIf="!isLoading || !isEditMode">
+        <!-- Account Dropdown -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Deposit Account</mat-label>
+          <mat-select formControlName="accountId" required>
+            <mat-option *ngFor="let acc of accounts" [value]="acc.id">
+              {{ acc.accountName }} ({{ acc.accountType }})
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="incomeForm.get('accountId')?.hasError('required')">
+            Deposit Account is required.
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Source -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Income Source</mat-label>
+          <input matInput type="text" formControlName="source" placeholder="e.g. Salary, Client Invoice, Dividend" required>
+          <mat-error *ngIf="incomeForm.get('source')?.hasError('required')">
+            Income Source is required.
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Amount -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Amount</mat-label>
+          <input matInput type="number" formControlName="amount" placeholder="0.00" step="0.01" min="0.01" required>
+          <span matPrefix>$&nbsp;</span>
+          <mat-error *ngIf="incomeForm.get('amount')?.hasError('required')">
+            Amount is required.
+          </mat-error>
+          <mat-error *ngIf="incomeForm.get('amount')?.hasError('min')">
+            Amount must be greater than zero.
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Date Picker -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Income Date</mat-label>
+          <input matInput [matDatepicker]="datePicker" formControlName="incomeDate" required>
+          <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+          <mat-datepicker #datePicker></mat-datepicker>
+          <mat-error *ngIf="incomeForm.get('incomeDate')?.hasError('required')">
+            Income Date is required.
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/income" [disabled]="isLoading">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="incomeForm.invalid || isLoading">
+            <span *ngIf="!isLoading">{{ isEditMode ? 'Save Changes' : 'Record Income' }}</span>
+            <mat-spinner diameter="20" *ngIf="isLoading" color="accent" class="spinner-inline"></mat-spinner>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

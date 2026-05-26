@@ -1,0 +1,75 @@
+<div class="form-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title class="form-title">
+        {{ isEditMode ? 'Edit Account' : 'Add Account' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ isEditMode ? 'Modify details of your account' : 'Register a new bank, card, or cash balance' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="form-content">
+      <div class="loading-overlay" *ngIf="isLoading && isEditMode">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <!-- Error Alert -->
+      <div class="alert alert-danger" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <form [formGroup]="accountForm" (ngSubmit)="onSubmit()" class="account-form" *ngIf="!isLoading || !isEditMode">
+        <!-- Account Name -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Account Name</mat-label>
+          <input matInput type="text" formControlName="accountName" placeholder="e.g. Chase Checkings" required>
+          <mat-error *ngIf="accountForm.get('accountName')?.hasError('required')">
+            Account Name is required.
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Account Type -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Account Type</mat-label>
+          <mat-select formControlName="accountType" required>
+            <mat-option *ngFor="let type of accountTypes" [value]="type">
+              {{ type }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="accountForm.get('accountType')?.hasError('required')">
+            Account Type is required.
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Account Number -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Account Number (Optional)</mat-label>
+          <input matInput type="text" formControlName="accountNumber" placeholder="e.g. **** 1234">
+        </mat-form-field>
+
+        <!-- Initial Balance -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Initial Balance</mat-label>
+          <input matInput type="number" formControlName="initialBalance" placeholder="0.00" step="0.01" min="0" required>
+          <span matPrefix>$&nbsp;</span>
+          <mat-error *ngIf="accountForm.get('initialBalance')?.hasError('required')">
+            Initial Balance is required.
+          </mat-error>
+          <mat-error *ngIf="accountForm.get('initialBalance')?.hasError('min')">
+            Initial Balance cannot be negative.
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/accounts" [disabled]="isLoading">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="accountForm.invalid || isLoading">
+            <span *ngIf="!isLoading">{{ isEditMode ? 'Save Changes' : 'Create Account' }}</span>
+            <mat-spinner diameter="20" *ngIf="isLoading" color="accent" class="spinner-inline"></mat-spinner>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

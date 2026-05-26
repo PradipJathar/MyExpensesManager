@@ -1844,7 +1844,7 @@ ng serve
 - [x] Chunk 11: Expenses module ✅
 - [x] Chunk 12: Budget module ✅
 - [x] Chunk 13: Reports & Dashboard ✅
-- [ ] Chunk 14: Accounts, Income, Settings ✅
+- [x] Chunk 14: Accounts, Income, Settings ✅
 - [ ] Chunk 15: Navigation & Polish ✅
 
 ### Deployment

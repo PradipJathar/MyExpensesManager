@@ -1,0 +1,111 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="header-section">
+    <div>
+      <h1 class="page-title">Income</h1>
+      <p class="page-subtitle">Track salary, invoice earnings, investments, and other cash inflows</p>
+    </div>
+    <button mat-raised-button color="primary" routerLink="/income/new">
+      <mat-icon>add</mat-icon> Add Income
+    </button>
+  </div>
+
+  <!-- Filters & Summary Layout -->
+  <div class="filter-and-summary-grid">
+    <!-- Filters Card -->
+    <mat-card class="filter-card">
+      <form [formGroup]="filterForm" class="filter-form">
+        <mat-form-field appearance="outline" class="flex-grow">
+          <mat-label>Search Source</mat-label>
+          <input matInput formControlName="sourceSearch" placeholder="e.g. Salary">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="date-field">
+          <mat-label>Start Date</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="date-field">
+          <mat-label>End Date</mat-label>
+          <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+
+        <button mat-button color="accent" type="button" (click)="resetFilters()" class="reset-btn">Reset</button>
+      </form>
+    </mat-card>
+
+    <!-- Summary Box -->
+    <div class="summary-boxes" *ngIf="!isLoading && !errorMessage">
+      <mat-card class="summary-card box-filtered">
+        <span class="summary-label">Filtered Income</span>
+        <h2 class="summary-val success-text">{{ totalIncome | currency }}</h2>
+      </mat-card>
+      <mat-card class="summary-card box-month">
+        <span class="summary-label">This Month's Total</span>
+        <h2 class="summary-val success-text">{{ thisMonthTotal | currency }}</h2>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <!-- Error Message -->
+  <div class="alert alert-danger" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Main Table Contents -->
+  <div class="table-container mat-elevation-z1" *ngIf="!isLoading && !errorMessage">
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredIncomes.length === 0">
+      <mat-icon class="empty-icon">attach_money</mat-icon>
+      <h3>No Income Records Found</h3>
+      <p>There are no income entries matching the selected criteria.</p>
+      <button mat-raised-button color="primary" routerLink="/income/new" class="empty-btn" *ngIf="allIncomes.length === 0">
+        Record First Income
+      </button>
+    </div>
+
+    <!-- Table -->
+    <table class="premium-table" *ngIf="filteredIncomes.length > 0">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Source</th>
+          <th>Account Deposited</th>
+          <th class="text-right">Amount</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let income of filteredIncomes">
+          <td>{{ income.incomeDate | date:'mediumDate' }}</td>
+          <td class="font-semibold">{{ income.source }}</td>
+          <td>
+            <span class="account-badge">
+              <mat-icon class="badge-icon">account_balance</mat-icon>
+              {{ income.accountName }}
+            </span>
+          </td>
+          <td class="text-right amount-text success-text">{{ income.amount | currency }}</td>
+          <td class="text-center actions-cell">
+            <button mat-icon-button [routerLink]="['/income', income.id, 'edit']" matTooltip="Edit">
+              <mat-icon class="icon-btn-edit">edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="onDelete(income.id)" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
