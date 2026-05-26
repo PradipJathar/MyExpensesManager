@@ -1,0 +1,86 @@
+.sidebar-nav-list {
+  padding-top: 12px;
+  height: 100%;
+  background-color: #1e293b; /* Slate dark modern dashboard color */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &.collapsed {
+    align-items: center;
+
+    .nav-item {
+      justify-content: center;
+      padding: 0 !important;
+      border-radius: 12px;
+      margin: 4px 8px;
+      width: 48px;
+      height: 48px;
+
+      ::ng-deep .mat-list-item-content {
+        justify-content: center;
+        padding: 0 !important;
+      }
+
+      .nav-icon {
+        margin: 0 !important;
+      }
+    }
+  }
+}
+
+.nav-item {
+  height: 46px;
+  margin: 2px 12px;
+  border-radius: 8px;
+  color: #94a3b8 !important; /* Muted text */
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+
+  ::ng-deep .mat-list-item-content {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 16px !important;
+  }
+
+  .nav-icon {
+    color: #94a3b8;
+    transition: color 0.2s ease, transform 0.2s ease;
+    margin-right: 16px;
+  }
+
+  .nav-label {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #f8fafc !important;
+
+    .nav-icon {
+      color: #f8fafc;
+      transform: scale(1.05);
+    }
+  }
+}
+
+/* Active Nav Highlight with Gradient Accent */
+.active-nav {
+  background: linear-gradient(90deg, rgba(14, 165, 233, 0.15) 0%, rgba(14, 165, 233, 0.05) 100%) !important;
+  color: #38bdf8 !important; /* Bright primary light blue accent */
+  border-left: 4px solid #0ea5e9;
+  border-radius: 0 8px 8px 0 !important;
+  margin-left: 0 !important;
+  padding-left: 8px !important;
+
+  .nav-icon {
+    color: #38bdf8 !important;
+  }
+
+  &:hover {
+    background: linear-gradient(90deg, rgba(14, 165, 233, 0.2) 0%, rgba(14, 165, 233, 0.08) 100%) !important;
+  }
+}

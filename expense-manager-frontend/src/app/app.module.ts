@@ -6,6 +6,8 @@ import { AppComponent } from './app.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
+import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 import { SharedModule } from './shared/shared.module';
 
 // Material Imports for Global Layout
@@ -14,6 +16,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -29,12 +33,15 @@ import { MatMenuModule } from '@angular/material/menu';
     MatSidenavModule,
     MatListModule,
     MatIconModule,
-    MatMenuModule
+    MatMenuModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
-

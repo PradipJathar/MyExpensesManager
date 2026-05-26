@@ -2,65 +2,96 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-}
-
-.app-toolbar {
-  z-index: 2;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.app-logo {
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  margin-left: 8px;
-}
-
-.toolbar-spacer {
-  flex: 1 1 auto;
-}
-
-.user-menu-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  overflow: hidden;
 }
 
 .sidenav-container {
   flex: 1;
+  height: calc(100vh - 64px);
 }
 
 .sidenav {
   width: 240px;
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
-  background-color: #ffffff;
+  border-right: none;
+  background-color: #1e293b;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
+
+  &.collapsed {
+    width: 70px;
+  }
 }
 
 .main-content {
-  background-color: #f8fafc;
+  background-color: #f1f5f9;
+  overflow-y: auto;
 }
 
 .route-container {
-  padding: 0;
-  min-height: calc(100vh - 64px);
+  padding: 24px;
   box-sizing: border-box;
-}
-
-.active-nav {
-  color: #3f51b5 !important;
-  background-color: rgba(63, 81, 181, 0.05);
-  border-left: 4px solid #3f51b5;
-  font-weight: 600;
-
-  mat-icon {
-    color: #3f51b5;
-  }
+  min-height: 100%;
 }
 
 .auth-wrapper {
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: #f1f5f9;
+}
+
+/* Global Loading Spinner Overlay */
+.global-spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.3); /* Slate translucent overlay */
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.2s ease;
+
+  .spinner-container {
+    background: #ffffff;
+    padding: 28px 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+
+    .loading-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+/* Scrollbar Customization for modern desktop layout */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+@media (max-width: 600px) {
+  .route-container {
+    padding: 16px;
+  }
 }

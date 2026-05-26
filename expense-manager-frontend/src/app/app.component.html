@@ -1,57 +1,18 @@
 <div class="app-container" *ngIf="currentUser$ | async as user; else noAuth">
-  <mat-toolbar color="primary" class="app-toolbar">
-    <button mat-icon-button (click)="sidenav.toggle()">
-      <mat-icon>menu</mat-icon>
-    </button>
-    <span class="app-logo">Expense Manager</span>
-    <span class="toolbar-spacer"></span>
-    <button mat-button [matMenuTriggerFor]="profileMenu" class="user-menu-btn">
-      <mat-icon>account_circle</mat-icon>
-      <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
-    </button>
-    <mat-menu #profileMenu="matMenu">
-      <button mat-menu-item (click)="logout()">
-        <mat-icon>exit_to_app</mat-icon>
-        <span>Logout</span>
-      </button>
-    </mat-menu>
-  </mat-toolbar>
+  <!-- Header with Sidebar toggle bindings -->
+  <app-header (toggleSidebar)="isHandset ? sidenav.toggle() : toggleSidebar()"></app-header>
 
   <mat-sidenav-container class="sidenav-container">
-    <mat-sidenav #sidenav mode="side" opened class="sidenav">
-      <mat-nav-list>
-        <a mat-list-item routerLink="/dashboard" routerLinkActive="active-nav">
-          <mat-icon mat-list-icon>dashboard</mat-icon>
-          <span mat-line>Dashboard</span>
-        </a>
-        <a mat-list-item routerLink="/expenses" routerLinkActive="active-nav">
-          <mat-icon mat-list-icon>receipt</mat-icon>
-          <span mat-line>Expenses</span>
-        </a>
-        <a mat-list-item routerLink="/income" routerLinkActive="active-nav">
-          <mat-icon mat-list-icon>trending_up</mat-icon>
-          <span mat-line>Income</span>
-        </a>
-        <a mat-list-item routerLink="/budgets" routerLinkActive="active-nav">
-          <mat-icon mat-list-icon>pie_chart</mat-icon>
-          <span mat-line>Budgets</span>
-        </a>
-        <a mat-list-item routerLink="/accounts" routerLinkActive="active-nav">
-          <mat-icon mat-list-icon>account_balance_wallet</mat-icon>
-          <span mat-line>Accounts</span>
-        </a>
-        <a mat-list-item routerLink="/reports" routerLinkActive="active-nav">
-          <mat-icon mat-list-icon>bar_chart</mat-icon>
-          <span mat-line>Reports</span>
-        </a>
-        <a mat-list-item routerLink="/settings/profile" routerLinkActive="active-nav">
-          <mat-icon mat-list-icon>settings</mat-icon>
-          <span mat-line>Settings</span>
-        </a>
-      </mat-nav-list>
-
+    <!-- Sidebar matching desktop vs handset layouts -->
+    <mat-sidenav #sidenav
+                 [mode]="isHandset ? 'over' : 'side'"
+                 [opened]="!isHandset"
+                 [class.collapsed]="isSidebarCollapsed && !isHandset"
+                 class="sidenav">
+      <app-sidebar [isCollapsed]="isSidebarCollapsed && !isHandset"></app-sidebar>
     </mat-sidenav>
 
+    <!-- Main Router Outlet Content area -->
     <mat-sidenav-content class="main-content">
       <div class="route-container">
         <router-outlet></router-outlet>
@@ -66,3 +27,10 @@
   </div>
 </ng-template>
 
+<!-- Global Loading Spinner Overlay -->
+<div class="global-spinner-overlay" *ngIf="isLoading$ | async">
+  <div class="spinner-container">
+    <mat-spinner diameter="60" strokeWidth="5"></mat-spinner>
+    <span class="loading-text">Loading...</span>
+  </div>
+</div>
